@@ -1,0 +1,23 @@
+version: '3'
+services:
+  db:
+    image: golang-api-db
+    container_name: golang-api-db
+    build: db
+    environment:
+      MYSQL_ROOT_PASSWORD: todo-password
+      TZ: "UTC"
+    ports:
+      - "127.0.0.1:3306:3306"
+  
+  api-server:
+    image: golang-api-server
+    container_name: golang-api-server
+    build:
+      context: ../
+      dockerfile: ./build/api/Dockerfile
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - db
+  
