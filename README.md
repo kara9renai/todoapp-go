@@ -16,7 +16,7 @@ make buildup
 
 ## part1 EntityとDTOを定義しよう
 TODO
-- [ ] ToddEntity定義
+- [ ] TodoEntity定義
 
 todo_entity.goのTodoEntityを定義してください。
 構造体には
