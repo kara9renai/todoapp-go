@@ -16,6 +16,8 @@ func NewRouter(tc TodoController) Router {
 
 func (ro *router) HandleTodosRequest(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	case "GET":
+		ro.tc.GetTodos(w, r)
 	default:
 		w.WriteHeader(405)
 	}
