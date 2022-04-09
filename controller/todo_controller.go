@@ -1,12 +1,15 @@
 package controller
 
 import (
+	"encoding/json"
 	"net/http"
 
+	"github.com/kara9renai/todoapp-go/controller/dto"
 	"github.com/kara9renai/todoapp-go/model/repository"
 )
 
 type TodoController interface {
+	GetTodos(w http.ResponseWriter, r *http.Request)
 }
 
 type toDoController struct {
@@ -18,6 +21,24 @@ func NewTodoController(tr repository.TodoRepository) TodoController {
 }
 
 func (tc *toDoController) GetTodos(w http.ResponseWriter, r *http.Request) {
+	todos, err := tc.tr.GetTodos()
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+
+	var todoRes []dto.TodoResponse
+	for _, v := range todos {
+		todoRes = append(todoRes, dto.TodoResponse{ID: v.ID, Title: v.Title, Content: v.Content})
+	}
+
+	var todosRes dto.TodosResponse
+	todosRes.Todos = todoRes
+
+	output, _ := json.MarshalIndent(todosRes.Todos, "", "\t\t")
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(output)
 }
 
 func (tc *toDoController) PostTodo(w http.ResponseWriter, r *http.Request) {
