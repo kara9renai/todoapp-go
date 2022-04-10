@@ -3,13 +3,16 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/kara9renai/todoapp-go/controller/dto"
+	"github.com/kara9renai/todoapp-go/model/entity"
 	"github.com/kara9renai/todoapp-go/model/repository"
 )
 
 type TodoController interface {
 	GetTodos(w http.ResponseWriter, r *http.Request)
+	PostTodo(w http.ResponseWriter, r *http.Request)
 }
 
 type toDoController struct {
@@ -42,6 +45,21 @@ func (tc *toDoController) GetTodos(w http.ResponseWriter, r *http.Request) {
 }
 
 func (tc *toDoController) PostTodo(w http.ResponseWriter, r *http.Request) {
+	body := make([]byte, r.ContentLength)
+	r.Body.Read(body)
+
+	var todoReq dto.TodoRequest
+	json.Unmarshal(body, &todoReq)
+
+	todo := entity.TodoEntity{Title: todoReq.Title, Content: todoReq.Content}
+
+	id, err := tc.tr.InsertTodo(todo)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	w.Header().Set("Location", r.Host+r.URL.Path+strconv.Itoa(id))
+	w.WriteHeader(201)
 }
 
 func (tc *toDoController) PutTodo(w http.ResponseWriter, r *http.Request) {
