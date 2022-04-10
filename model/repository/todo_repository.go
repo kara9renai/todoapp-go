@@ -9,6 +9,7 @@ import (
 
 type TodoRepository interface {
 	GetTodos() (todos []entity.TodoEntity, err error)
+	InsertTodo(todo entity.TodoEntity) (id int, err error)
 }
 
 type todoRepository struct {
@@ -40,6 +41,28 @@ func (tr *todoRepository) GetTodos() (todos []entity.TodoEntity, err error) {
 }
 
 func (tr *todoRepository) InsertTodo(todo entity.TodoEntity) (id int, err error) {
+	const insert = `INSERT INTO todo (title, content) VALUES (?, ?)`
+
+	// prepare statement
+	stmt, err := Db.Prepare(insert)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	result, err := stmt.Exec(todo.Title, todo.Content)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	id = int(lastId)
+
 	return
 }
 
