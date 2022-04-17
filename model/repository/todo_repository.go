@@ -11,6 +11,7 @@ type TodoRepository interface {
 	GetTodos() (todos []entity.TodoEntity, err error)
 	InsertTodo(todo entity.TodoEntity) (id int, err error)
 	UpdateTodo(todo entity.TodoEntity) (err error)
+	DeleteTodo(id int) (err error)
 }
 
 type todoRepository struct {
@@ -75,5 +76,8 @@ func (tr *todoRepository) UpdateTodo(todo entity.TodoEntity) (err error) {
 }
 
 func (tr *todoRepository) DeleteTodo(id int) (err error) {
+	const deletefmt = `DELETE FROM todo WHERE id = ?`
+
+	_, err = Db.Exec(deletefmt, id)
 	return
 }

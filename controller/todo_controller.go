@@ -15,6 +15,7 @@ type TodoController interface {
 	GetTodos(w http.ResponseWriter, r *http.Request)
 	PostTodo(w http.ResponseWriter, r *http.Request)
 	PutTodo(w http.ResponseWriter, r *http.Request)
+	DeleteTodo(w http.ResponseWriter, r *http.Request)
 }
 
 type toDoController struct {
@@ -88,4 +89,17 @@ func (tc *toDoController) PutTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (tc *toDoController) DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	todoId, err := strconv.Atoi(path.Base(r.URL.Path))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	err = tc.tr.DeleteTodo(todoId)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+
+	w.WriteHeader(204)
 }
