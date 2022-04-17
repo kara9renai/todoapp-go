@@ -10,6 +10,7 @@ import (
 type TodoRepository interface {
 	GetTodos() (todos []entity.TodoEntity, err error)
 	InsertTodo(todo entity.TodoEntity) (id int, err error)
+	UpdateTodo(todo entity.TodoEntity) (err error)
 }
 
 type todoRepository struct {
@@ -67,6 +68,9 @@ func (tr *todoRepository) InsertTodo(todo entity.TodoEntity) (id int, err error)
 }
 
 func (tr *todoRepository) UpdateTodo(todo entity.TodoEntity) (err error) {
+	const update = `UPDATE todo SET title = ?, content = ? WHERE id = ?`
+
+	_, err = Db.Exec(update, todo.Title, todo.Content, todo.ID)
 	return
 }
 

@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"path"
 	"strconv"
 
 	"github.com/kara9renai/todoapp-go/controller/dto"
@@ -13,6 +14,7 @@ import (
 type TodoController interface {
 	GetTodos(w http.ResponseWriter, r *http.Request)
 	PostTodo(w http.ResponseWriter, r *http.Request)
+	PutTodo(w http.ResponseWriter, r *http.Request)
 }
 
 type toDoController struct {
@@ -63,6 +65,26 @@ func (tc *toDoController) PostTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (tc *toDoController) PutTodo(w http.ResponseWriter, r *http.Request) {
+	todoId, err := strconv.Atoi(path.Base(r.URL.Path))
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+
+	body := make([]byte, r.ContentLength)
+	r.Body.Read(body)
+	var todoReq dto.TodoRequest
+	json.Unmarshal(body, &todoReq)
+
+	todo := entity.TodoEntity{ID: todoId, Title: todoReq.Title, Content: todoReq.Content}
+
+	err = tc.tr.UpdateTodo(todo)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+
+	w.WriteHeader(204)
 }
 
 func (tc *toDoController) DeleteTodo(w http.ResponseWriter, r *http.Request) {
